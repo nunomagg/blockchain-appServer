@@ -1,0 +1,47 @@
+buildscript {
+    ext {
+        kotlin_version = '1.2.60'
+        spark_kotlin_version = '1.0.0-alpha'
+        ok_http_version = '3.11.0'
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // Required for Kotlin integration
+        classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlin_version"
+    }
+}
+
+
+apply plugin: 'kotlin' // Required for Kotlin integration
+apply plugin: 'groovy'
+apply plugin: 'application'
+
+group = "com.nunomagg"
+version = "1.0-SNAPSHOT"
+mainClassName = "com.nunomagg.ApplicationKt"
+
+repositories {
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
+    compile "com.sparkjava:spark-kotlin:$spark_kotlin_version"
+
+    compile "org.slf4j:slf4j-simple:1.7.24"
+
+    compile "com.squareup.okhttp3:okhttp:$ok_http_version"
+
+    compile 'com.google.code.gson:gson:2.2.4'
+
+    //mandatory spock dependencies
+    compile 'org.codehaus.groovy:groovy-all:2.4.4'
+    testCompile "org.spockframework:spock-core:1.1-groovy-2.4"
+    testCompile 'cglib:cglib-nodep:2.2'       // For mocking classes
+}
