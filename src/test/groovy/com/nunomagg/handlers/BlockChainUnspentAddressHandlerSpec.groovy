@@ -4,6 +4,7 @@ import com.google.gson.internal.LinkedTreeMap
 import com.nunomagg.data.AddressOutputResponse
 import com.nunomagg.data.HandlerResponse
 import com.nunomagg.data.InvalidOutputResponse
+import com.nunomagg.data.Request
 import com.nunomagg.errormessages.InvalidNumericValueErrorMessage
 import com.nunomagg.errormessages.NoFreeOutputsErrorMessage
 import okhttp3.*
@@ -36,12 +37,12 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
                 '    "unspent_outputs":[\n' +
                 '    \n' +
                 '        {\n' +
-                '            "tx_hash":"'+valid_tx_hash+'",\n' +
+                '            "tx_hash":"' + valid_tx_hash + '",\n' +
                 '            "tx_hash_big_endian":"ebe2844ece6856fd77aa82d3c07466e1e320e88e19ca9b85ab42afe3bd8cf874",\n' +
                 '            "tx_index":59591229,\n' +
-                '            "tx_output_n": '+valid_idx+',\n' +
+                '            "tx_output_n": ' + valid_idx + ',\n' +
                 '            "script":"76a91499bc78ba577a95a11f1a344d4d2ae55f2f857b9888ac",\n' +
-                '            "value": '+valid_value+',\n' +
+                '            "value": ' + valid_value + ',\n' +
                 '            "value_hex": "571b38",\n' +
                 '            "confirmations":228101\n' +
                 '        }\n' +
@@ -56,7 +57,7 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
 
     }
 
-    def setup(){
+    def setup() {
         mockBlockChainEndpointRequests = Mock(BlockChainEndpoints)
     }
 
@@ -67,9 +68,10 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
 
         def addressHandler = new BlockChainUnspentAddressHandler(mockBlockChainEndpointRequests)
 
-        def request = Mock(spark.Request.class)
-        request.params(":address") >> "address"
-        request.queryParamOrDefault("limit", "1000") >> "1000"
+        def request = new Request(
+                ["address": 'anAddress'],
+                ["limit": "1000"]
+        )
 
         when:
         HandlerResponse handlerResponse = addressHandler.handle(request)
@@ -127,7 +129,7 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
         transaction == null
     }
 
-    def 'should return an HandlerResponse with the correct error message'(){
+    def 'should return an HandlerResponse with the correct error message'() {
         when:
         def errorMessage = new InvalidNumericValueErrorMessage().message
         def addressHandler = new BlockChainUnspentAddressHandler(mockBlockChainEndpointRequests)
@@ -153,7 +155,7 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
         outputResponse.message == errorMessage
     }
 
-    def 'should return an HandlerResponse with a generic message if the error is unknown'(){
+    def 'should return an HandlerResponse with a generic message if the error is unknown'() {
         when:
         def errorMessage = "A generic error message"
         def addressHandler = new BlockChainUnspentAddressHandler(mockBlockChainEndpointRequests)
@@ -168,14 +170,15 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
 
     }
 
-    def 'should test that given a valid JsonResponse from blockChain the output is process correctly'(){
+    def 'should test that given a valid JsonResponse from blockChain the output is process correctly'() {
         given:
         mockBlockChainEndpointRequests.getUnspentTransactions(_ as String, _ as String, _ as OkHttpClient) >>
                 validUnspentTransactionResponse(validJsonBody)
 
-        def request = Mock(spark.Request.class)
-        request.params(":address") >> "address"
-        request.queryParamOrDefault("limit", "1000") >> "1000"
+        def request = new Request(
+                ["address": 'anAddress'],
+                ["limit": "1000"]
+        )
 
         def addressHandler = new BlockChainUnspentAddressHandler(mockBlockChainEndpointRequests)
 
@@ -201,14 +204,15 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
     }
 
 
-    def 'should test that given a valid empty JsonResponse from blockChain the output is process correctly'(){
+    def 'should test that given a valid empty JsonResponse from blockChain the output is process correctly'() {
         given:
         mockBlockChainEndpointRequests.getUnspentTransactions(_ as String, _ as String, _ as OkHttpClient) >>
                 validUnspentTransactionResponse(validNoOutputsJson)
 
-        def request = Mock(spark.Request.class)
-        request.params(":address") >> "address"
-        request.queryParamOrDefault("limit", "1000") >> "1000"
+        def request = new Request(
+                ["address": 'anAddress'],
+                ["limit": "1000"]
+        )
 
         def addressHandler = new BlockChainUnspentAddressHandler(mockBlockChainEndpointRequests)
 
@@ -234,7 +238,7 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
         new Response.Builder()
                 .code(HttpStatus.OK_200)
                 .body(ResponseBody.create(MediaType.parse("json"), jsonBody))
-                .request(new Request.Builder()
+                .request(new okhttp3.Request.Builder()
                 .url("https://blockchain.info/unspent?active=1F1tAaz5x1HUXrCNLbtMDqcw6o5GNn4xqX")
                 .build()
         )
@@ -247,7 +251,7 @@ class BlockChainUnspentAddressHandlerSpec extends Specification {
         new Response.Builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR_500)
                 .body(ResponseBody.create(MediaType.parse("text"), errorMessage))
-                .request(new Request.Builder()
+                .request(new okhttp3.Request.Builder()
                 .url("https://blockchain.info/unspent?active=address")
                 .build()
         )

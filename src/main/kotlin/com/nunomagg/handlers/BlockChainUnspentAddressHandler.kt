@@ -3,6 +3,7 @@ package com.nunomagg.handlers
 import com.google.gson.internal.LinkedTreeMap
 import com.nunomagg.data.AddressOutputData
 import com.nunomagg.data.AddressOutputResponse
+import com.nunomagg.data.Request
 import com.nunomagg.data.HandlerResponse
 import okhttp3.OkHttpClient
 import java.math.BigDecimal
@@ -13,10 +14,10 @@ class BlockChainUnspentAddressHandler(private val blockChainEndpointRequestsImpl
         private val httpClient = OkHttpClient()
     }
 
-    override fun handle(request: spark.Request): HandlerResponse {
+    override fun handle(request: Request): HandlerResponse {
         val response = blockChainEndpointRequestsImpl.getUnspentTransactions(
-                request.params(":address"),
-                request.queryParamOrDefault("limit", DEFAULT_UNSPENT_TRANSACTIONS_LIMIT),
+                request.pathParams["address"],
+                request.queryParams.getOrDefault("limit", DEFAULT_UNSPENT_TRANSACTIONS_LIMIT)!!,
                 httpClient
         )
 

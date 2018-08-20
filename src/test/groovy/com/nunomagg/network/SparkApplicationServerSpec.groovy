@@ -40,7 +40,7 @@ class SparkApplicationServerSpec extends Specification {
         List<AddressOutputData> outputData = [new AddressOutputData(valid_value, valid_tx_hash, valid_idx)]
         AddressOutputResponse addressOutputResponse = new AddressOutputResponse(outputData)
         def blockChainUnspentAddressHandler = Mock(ServiceHandler.class)
-        blockChainUnspentAddressHandler.handle(_ as spark.Request) >> new HandlerResponse(true, addressOutputResponse, 200)
+        blockChainUnspentAddressHandler.handle(_ as com.nunomagg.data.Request) >> new HandlerResponse(true, addressOutputResponse, 200)
 
         applicationServer = new SparkApplicationServer(blockChainUnspentAddressHandler)
         applicationServer.start(port)
@@ -69,7 +69,7 @@ class SparkApplicationServerSpec extends Specification {
         def invalidBitcoinAddressMessage = new InvalidBitcoinAddressErrorMessage().getMessage()
         OutputResponse invalidOutputResponse = new InvalidOutputResponse(invalidBitcoinAddressMessage)
         def blockChainUnspentAddressHandler = Mock(ServiceHandler.class)
-        blockChainUnspentAddressHandler.handle(_ as spark.Request) >> new HandlerResponse(false, invalidOutputResponse, 500)
+        blockChainUnspentAddressHandler.handle(_ as com.nunomagg.data.Request) >> new HandlerResponse(false, invalidOutputResponse, 500)
 
         applicationServer = new SparkApplicationServer(blockChainUnspentAddressHandler)
         applicationServer.start(port)
