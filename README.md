@@ -49,3 +49,6 @@ output:
 
 }
 ``` 
+
+## Solution
+This solution was written in Kotlin, using Spark-kotlin as the application server and Spock framework as it's test framework.
